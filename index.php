@@ -502,7 +502,7 @@ $id_empresa = $_SESSION['id_empresa'];
 				 $("#info").prepend("<hr>");
 				 $("#info").prepend('<div style="color: #515151;/* font-size: x-large; */background-color: #cbcbcb;border-radius: 3px;color: #333333;font-weight: bold;"">Tetra</div>');
 				 $("#info").append("<hr>");
-				 $("#info").append("<img src='imagenes/excel.png' style='float: right;width: 12%;'>");
+				 $("#info").append("<img src='imagenes/excel.png' style='float: right;width: 7%;top: -3px;position: relative;'>");
 				 if(swOn == 1){
 				 $("#info").append('<div class="onoffswitch" style="left: 0%;"><input onclick="validarRiego(id,'+idControl+')"type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked><label class="onoffswitch-label" for="myonoffswitch"><span class="onoffswitch-inner"></span><span class="onoffswitch-switch"></span></label></div>');	 
 				 

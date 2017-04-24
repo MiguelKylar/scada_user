@@ -1,5 +1,8 @@
-html{
-	overflow: hidden;
+html {
+    overflow: hidden;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 #herramientas{/*navbar*/
     height: 10%;
@@ -74,15 +77,19 @@ table {
 /*BOTON ON OFF*/
 /*-----------------------------------------------------------------------------------------------*/
 .onoffswitch {
-    position: relative; width: 90px;
+    position: relative; width: 52px;
     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
 }
 .onoffswitch-checkbox {
     display: none;
 }
 .onoffswitch-label {
-    display: block; overflow: hidden; cursor: pointer;
-    border: 2px solid #999999; border-radius: 20px;
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid #999999;
+    border-radius: 20px;
+    height: 17px;
 }
 .onoffswitch-inner {
     display: block; width: 200%; margin-left: -100%;
@@ -94,23 +101,28 @@ table {
     box-sizing: border-box;
 }
 .onoffswitch-inner:before {
-    content: "ON";
+    content: "";
     padding-left: 10px;
     background-color: #6D7375; color: #FFFFFF;
 }
 .onoffswitch-inner:after {
-    content: "OFF";
+    content: "";
     padding-right: 10px;
     background-color: #EEEEEE; color: #999999;
     text-align: right;
 }
 .onoffswitch-switch {
-    display: block; width: 15px; margin: 7.5px;
+    display: block;
+    width: 15px;
+    margin: 7.5px;
     background: #FFFFFF;
-    position: absolute; top: 0; bottom: 0;
+    position: absolute;
+    top: -6px;
+    bottom: -7px;
     right: 56px;
-    border: 2px solid #999999; border-radius: 20px;
-    transition: all 0.3s ease-in 0s; 
+    border: 2px solid #999999;
+    border-radius: 20px;
+    transition: all 0.3s ease-in 0s;
 }
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
     margin-left: 0;
