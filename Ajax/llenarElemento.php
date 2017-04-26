@@ -3,6 +3,7 @@
 $id_elemento = $_POST['id_elemento'];
 include("bd.php");
 $indice = 0;
+$sw = 0;
 $sensores = NULL;
 $sql = "select * from elemento_aplicacion where id_elemento = $id_elemento and prioridad = 1";
 $consulta = mysql_query($sql, $conEmp);

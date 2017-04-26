@@ -5,7 +5,6 @@ session_start();
 $id_empresa = $_SESSION['id_empresa'];
 ?>
 <html>
-
     <head>
         <title>scada</title>
         <meta charset="UTF-8">
@@ -33,38 +32,7 @@ $id_empresa = $_SESSION['id_empresa'];
     </head>
     <script>
         var globalventana = 1;
-        function unique(arr) {
-            var hash = {}, result = [];
-            for (var i = 0; i < arr.length; i++)
-                if (!(arr[i] in hash)) { //it works with objects! in FF, at least
-                    hash[arr[i]] = true;
-                    result.push(arr[i]);
-                }
-            return result;
-        }
-        function ventana() {
-            if (!$('#myonoffswitch2').prop('checked')) {
-                globalventana = 2;
-            }
-            if ($('#myonoffswitch2').prop('checked')) {
-                globalventana = 1;
-            }
-        }
-        function enviarGrafico() {
-            if (globalventana == 1) {
-                window.open('', 'ventanaForm', 'menubar:no,toolbar=no,resizable=no,s crollbars=no,width=600,height=200,top=100,left=100 ');
-                document.forms["myform"].submit();
-            }
-            if (globalventana == 2) {
-                window.open('', 'ventanaForm', '');
-                document.forms["myform"].submit();
-            }
-        }
-        function enviarTimeline() {
-            window.open('', 'ventanaForm2', 'menubar:no,toolbar=no,resizable=no,s crollbars=no,width=600,height=200,top=100,left=100 ');
-            document.forms["myform2"].submit();
-        }
-        var id_empresa = <?php echo $id_empresa; ?>;
+                var id_empresa = <?php echo $id_empresa; ?>;
         var i = 1;
         var productoFinal = new Array();
         var VMFactory = new Array();
@@ -110,10 +78,284 @@ $id_empresa = $_SESSION['id_empresa'];
                         });
                     }
                 }
-                llenarElemento();
             }
         });
+        var id_empresa = <?php echo $id_empresa; ?>;
+            var data = 'id_empresa=' + id_empresa;
+            $.ajax({
+                url: 'Ajax/sensoresEmpresa.php',
+                type: 'post',
+                data: data,
+                //async:false,    
+                beforeSend: function () {
+                },
+                success: function (resp) {
+                    var sensores = JSON.parse(resp);
+                    var id_elementos = [];
+                    m = $('#padre').find('div').length
+                    m = 100;
+                    x = 0;
+                    for (i = 0; i <= m; i++) {
+                        if ($("#z_" + i + "")[0]) {
+                            id_elementos[x] = i;
+                            x++;
+                        }
+                    }
+                    tipo = 'general';
+                    var data = 'id_elementos=' + id_elementos + '&tipo=' + tipo;
+                    $.ajax({
+                        url: 'Ajax/umbrales.php',
+                        type: 'post',
+                        data: data,
+                        //async:false,    
+                        beforeSend: function () {
+                        },
+                        success: function (resp) {
+                            $(".controlP").remove();
+                            $(".sensorP").remove();
+                            var elementos = JSON.parse(resp);
+                            for (i = 0; i < elementos.length; i++) {
+                                
+                                if (tipo != "control" && tipo != "general") {
 
+                                    if (elementos[i].tipo == tipo) {
+                                        valor = elementos[i].valor;
+                                        for (m = 0; m < elementos.length; m++) {
+                                            if (elementos[i].id_elemento == elementos[m].id_elemento) {
+                                                elementos[m].sw = 1;
+                                            }
+                                        }
+                                        umbral_superior = elementos[i].umbral_superior;
+                                        umbral_inferior = elementos[i].umbral_inferior;
+                                        for (x = 1; x < productoFinal.length; x++) {
+                                            id_img = "z_" + idelemento;
+                                            idelemento = productoFinal[x].getIdelemento();
+                                            if (idelemento == elementos[i].id_elemento) {
+                                                var tipoObj = productoFinal[x].getTipo();
+
+                                                if (valor < umbral_inferior) {
+                                                    neutral = productoFinal[x].getImgDown();
+                                                    alert(neutral);
+                                                    productoFinal[x].cambiarUrl(neutral);
+                                                    var y = document.getElementById("dom_" + idelemento);
+                                                    y.remove(y.selectedIndex);
+                                                    var div = productoFinal[x].crearDOM();
+                                                    var nuevoElemento = $(div);
+                                                    $('#padre').append(nuevoElemento);
+                                                } else if (valor > umbral_superior) {
+                                                    neutral = productoFinal[x].getImgUp();
+                                                    productoFinal[x].cambiarUrl(neutral);
+                                                    var y = document.getElementById("dom_" + idelemento);
+                                                    y.remove(y.selectedIndex);
+                                                    var div = productoFinal[x].crearDOM();
+                                                    var nuevoElemento = $(div);
+                                                    $('padre').append(nuevoElemento);
+                                                } else {
+                                                    neutral = productoFinal[x].getImgNeutral();
+                                                    productoFinal[x].cambiarUrl(neutral);
+                                                    var y = document.getElementById("dom_" + idelemento);
+                                                    y.remove(y.selectedIndex);
+                                                    var div = productoFinal[x].crearDOM();
+                                                    var nuevoElemento = $(div);
+                                                    $('#padre').append(nuevoElemento);
+                                                }
+                                                if (tipoObj == 2) {
+                                                    var dom = "dom_" + elementos[i].id_elemento;
+                                                    $("#" + dom).append("<div id='label' class='controlP' style='position:relative; z-index:9999;'><strong>" + valor + elementos[i].unidad + "</strong></div>");
+                                                }
+                                                 
+                                            }
+                                        }
+                                    } else if (elementos[i].sw != 1) {
+                                        for (x = 1; x < productoFinal.length; x++) {
+                                            idelemento = productoFinal[x].getIdelemento();
+                                            if (idelemento == elementos[i].id_elemento) {
+                                                neutral = productoFinal[x].getImgOriginal();
+                                                productoFinal[x].cambiarUrl(neutral);
+                                                var y = document.getElementById("dom_" + idelemento);
+                                                y.remove(y.selectedIndex);
+                                                var div = productoFinal[x].crearDOM();
+                                                var nuevoElemento = $(div);
+                                                $('#padre').append(nuevoElemento);
+                                            }
+                                        }
+                                    }                                   
+                                } else if (tipo == "control") {
+
+                                    if (elementos[i].tipo == tipo) {
+                                        valor = elementos[i].valor;
+                                        for (m = 0; m < elementos.length; m++) {
+                                            if (elementos[i].id_elemento == elementos[m].id_elemento) {
+                                                elementos[m].sw = 1;
+                                            }
+                                        }
+                                        umbral_superior = elementos[i].umbral_superior;
+                                        umbral_inferior = elementos[i].umbral_inferior;
+                                        for (x = 1; x < productoFinal.length; x++) {
+                                            idelemento = productoFinal[x].getIdelemento();
+                                            id_img = "z_" + idelemento;
+
+                                            if (idelemento == elementos[i].id_elemento) {
+                                                var tipoObj = productoFinal[x].getTipo();
+
+                                                if (valor == "Detenido") {
+                                                    neutral = productoFinal[x].getImgUp();
+                                                    productoFinal[x].cambiarUrl(neutral);
+                                                    var y = document.getElementById("dom_" + idelemento);
+                                                    y.remove(y.selectedIndex);
+                                                    var div = productoFinal[x].crearDOM();
+                                                    var nuevoElemento = $(div);
+                                                    $('#padre').append(nuevoElemento);
+                                                } else if (valor == "Funcionando") {
+                                                    neutral = productoFinal[x].getImgDown();
+                                                    productoFinal[x].cambiarUrl(neutral);
+                                                    var y = document.getElementById("dom_" + idelemento);
+                                                    y.remove(y.selectedIndex);
+                                                    var div = productoFinal[x].crearDOM();
+                                                    var nuevoElemento = $(div);
+                                                    $('#padre').append(nuevoElemento);
+                                                }
+                                                if (tipoObj == 2) {
+                                                    var dom = "dom_" + elementos[i].id_elemento;
+                                                    $("#" + dom).append("<div id='label' class='controlP' style='position:relative; z-index:9999;'><strong>" + valor + elementos[i].unidad + "</strong></div>");
+                                                }
+                                            }
+                                        }
+                                    } else if (elementos[i].sw != 1) {
+                                        for (x = 1; x < productoFinal.length; x++) {
+                                            idelemento = productoFinal[x].getIdelemento();
+                                            if (idelemento == elementos[i].id_elemento) {
+                                                neutral = productoFinal[x].getImgOriginal();
+                                                productoFinal[x].cambiarUrl(neutral);
+                                                var y = document.getElementById("dom_" + idelemento);
+                                                y.remove(y.selectedIndex);
+                                                var div = productoFinal[x].crearDOM();
+                                                var nuevoElemento = $(div);
+                                                $('#padre').append(nuevoElemento);
+                                            }
+                                        }
+                                    }
+                                } else if (tipo == "general") {
+                                    console.log(elementos[i].tipo); console.log("\n");
+                                    console.log(elementos[i].id_elemento);console.log("\n");
+                                    console.log(elementos[i].prioridad);console.log("\n");
+                                    console.log("----------------");console.log("\n");
+                                    if (elementos[i].prioridad == 1) {
+                                    
+                                        if (elementos[i].tipo == "control") {
+                                            valor = elementos[i].valor;
+                                            for (m = 0; m < elementos.length; m++) {
+                                                if (elementos[i].id_elemento == elementos[m].id_elemento) {
+                                                    elementos[m].sw = 1;
+                                                }
+                                            }
+                                            umbral_superior = elementos[i].umbral_superior;
+                                            umbral_inferior = elementos[i].umbral_inferior;
+                                            for (x = 1; x < productoFinal.length; x++) {
+                                                idelemento = productoFinal[x].getIdelemento();
+                                                dom = "dom_" + idelemento;
+                                                id_img = "z_" + idelemento;
+                                                if (idelemento == elementos[i].id_elemento) {
+                                                    var tipoObj = productoFinal[x].getTipo();
+                                                    if (valor == "Detenido") {
+                                                        neutral = productoFinal[x].getImgUp();
+                                                        productoFinal[x].cambiarUrl(neutral);
+                                                        var y = document.getElementById("dom_" + idelemento);
+                                                        y.remove(y.selectedIndex);
+                                                        var div = productoFinal[x].crearDOM();
+                                                        var nuevoElemento = $(div);
+                                                        $('#padre').append(nuevoElemento);
+                                                        
+                                                    } else if (valor == "Funcionando") {
+                                                        
+                                                        neutral = productoFinal[x].getImgDown();
+                                                        productoFinal[x].cambiarUrl(neutral);
+                                                        var y = document.getElementById("dom_" + idelemento);
+                                                        y.remove(y.selectedIndex);
+                                                        var div = productoFinal[x].crearDOM();
+                                                        var nuevoElemento = $(div);
+                                                        $('#padre').append(nuevoElemento);
+                                                    }
+                                                    if (tipoObj == 2) {
+                                                        var dom = "dom_" + elementos[i].id_elemento;
+                                                        $("#" + dom).append("<div id='label' class='controlP' style='position:relative; z-index:9999;'><strong>" + valor + elementos[i].unidad + "</strong></div>");
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            valor = elementos[i].valor;
+                                            for (m = 0; m < elementos.length; m++) {
+                                                if (elementos[i].id_elemento == elementos[m].id_elemento) {
+                                                    elementos[m].sw = 1;
+                                                }
+                                            }
+
+
+                                            umbral_superior = elementos[i].umbral_superior;
+                                            umbral_inferior = elementos[i].umbral_inferior;
+                                            for (x = 1; x < productoFinal.length; x++) {
+                                                id_img = "z_" + idelemento;
+                                                idelemento = productoFinal[x].getIdelemento();
+                                                dom = "dom_" + idelemento;
+                                                if (idelemento == elementos[i].id_elemento) {
+                                                    var tipoObj = productoFinal[x].getTipo();
+                                                        alert(valor);
+                                                    if (valor < umbral_inferior) {
+                                                        neutral = productoFinal[x].getImgDown();
+                                                        alert(neutral);
+                                                        productoFinal[x].cambiarUrl(neutral);
+                                                        var y = document.getElementById("dom_" + idelemento);
+                                                        //y.remove(y.selectedIndex);
+                                                        var div = productoFinal[x].crearDOM();
+                                                        var nuevoElemento = $(div);
+                                                        $('#padre').append(nuevoElemento);
+                                                    } else if (valor > umbral_superior) {
+                                                        alert(neutral);
+                                                        neutral = productoFinal[x].getImgUp();
+                                                        productoFinal[x].cambiarUrl(neutral);
+                                                        var y = document.getElementById("dom_" + idelemento);
+                                                        //y.remove(y.selectedIndex);
+                                                        var div = productoFinal[x].crearDOM();
+                                                        var nuevoElemento = $(div);
+                                                        $('padre').append(nuevoElemento);
+                                                    } else {
+                                                        neutral = productoFinal[x].getImgNeutral();
+                                                        productoFinal[x].cambiarUrl(neutral);
+                                                        var y = document.getElementById("dom_" + idelemento);
+                                                        //y.remove(y.selectedIndex);
+                                                        var div = productoFinal[x].crearDOM();
+                                                        var nuevoElemento = $(div);
+                                                        $('#padre').append(nuevoElemento);
+                                                        alert(neutral);
+                                                    }
+                                                    if (tipoObj == 2) {
+                                                        var dom = "dom_" + elementos[i].id_elemento;
+                                                        $("#" + dom).append("<div id='label' class='controlP' style='position:relative; z-index:9999;'><strong>" + valor + elementos[i].unidad + "</strong></div>");
+                                                    }
+                                                }
+                                            }llenarElemento();
+                                        }
+                                    } else if (elementos[i].sw != 1) {
+                                        for (x = 1; x < productoFinal.length; x++) {
+                                            idelemento = productoFinal[x].getIdelemento();
+                                            if (idelemento == elementos[i].id_elemento) {
+                                                neutral = productoFinal[x].getImgOriginal();
+                                                productoFinal[x].cambiarUrl(neutral);
+                                                var y = document.getElementById("dom_" + idelemento);
+                                                y.remove(y.selectedIndex);
+                                                var div = productoFinal[x].crearDOM();
+                                                var nuevoElemento = $(div);
+                                                $('#padre').append(nuevoElemento);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                
+        });
         var data = 'id_empresa=' + id_empresa;
         $.ajax({
             url: 'Ajax/sensoresEmpresa.php',
@@ -137,185 +379,41 @@ $id_empresa = $_SESSION['id_empresa'];
                         x++;
                     }
                 }
-                tipo = $('select[id=sensores]').val();
-                tipo = 'general';
-                var data = 'id_elementos=' + id_elementos + '&tipo=' + tipo;
-                $.ajax({
-                    url: 'Ajax/umbrales.php',
-                    type: 'post',
-                    data: data,
-                    beforeSend: function () {
-                    },
-                    success: function (resp) {
-                        var elementos = JSON.parse(resp);
-                        for (i = 0; i < elementos.length; i++) {
-                            if (tipo != "control" && tipo != "general") {
-                                if (elementos[i].tipo == tipo) {
-                                    valor = elementos[i].valor;
-                                    for (m = 0; m < elementos.length; m++) {
-                                        if (elementos[i].id_elemento == elementos[m].id_elemento) {
-                                            elementos[m].sw = 1;
-                                        }
-                                    }
-                                    umbral_superior = elementos[i].umbral_superior;
-                                    umbral_inferior = elementos[i].umbral_inferior;
-                                    for (x = 1; x < productoFinal.length; x++) {
-                                        id_img = "z_" + idelemento;
-                                        idelemento = productoFinal[x].getIdelemento();
-                                        if (idelemento == elementos[i].id_elemento) {
-                                            if (valor < umbral_inferior) {
-                                                $("#" + id_img).css({
-                                                    webkitfilter: "hue-rotate(45deg) brightness(600%);",
-                                                    filter: "hue-rotate(45deg) brightness(600%);"
-                                                });
-                                            } else if (valor > umbral_superior) {
-                                                id_img = "z_" + idelemento;
-                                                $("#" + id_img).css({
-                                                    webkitfilter: "hue-rotate(45deg) brightness(600%);",
-                                                    filter: "hue-rotate(45deg) brightness(600%);"
-                                                });
-                                            } else {
-                                                id_img = "z_" + idelemento;
-                                                $("#" + id_img).css({
-                                                    webkitfilter: "hue-rotate(45deg) brightness(600%);",
-                                                    filter: "hue-rotate(45deg) brightness(600%);"
-                                                });
-                                            }
-                                        }
-                                    }
-                                } else if (elementos[i].sw != 1) {
-                                    for (x = 1; x < productoFinal.length; x++) {
-                                        idelemento = productoFinal[x].getIdelemento();
-                                        if (idelemento == elementos[i].id_elemento) {
-                                            id_img = "z_" + idelemento;
-                                            $("#" + id_img).css({
-                                                webkitfilter: "hue-rotate(108deg) brightness(600%);",
-                                                filter: "hue-rotate(108deg) brightness(600%);"
-                                            });
-                                        }
-                                    }
-                                }
-                            } else if (tipo == "control") {
-                                if (elementos[i].tipo == tipo) {
-                                    valor = elementos[i].valor;
-                                    for (m = 0; m < elementos.length; m++) {
-                                        if (elementos[i].id_elemento == elementos[m].id_elemento) {
-                                            elementos[m].sw = 1;
-                                        }
-                                    }
-                                    umbral_superior = elementos[i].umbral_superior;
-                                    umbral_inferior = elementos[i].umbral_inferior;
-                                    for (x = 1; x < productoFinal.length; x++) {
-                                        idelemento = productoFinal[x].getIdelemento();
-                                        id_img = "z_" + idelemento;
-                                        if (idelemento == elementos[i].id_elemento) {
-                                            if (valor == "Detenido") {
-                                                $("#" + id_img).css({
-                                                    webkitfilter: "hue-rotate(45deg) brightness(600%);",
-                                                    filter: "hue-rotate(45deg) brightness(600%);"
-                                                });
-                                            } else if (valor == "Funcionando") {
-                                                id_img = "z_" + idelemento;
-                                                $("#" + id_img).css({
-                                                    webkitfilter: "hue-rotate(45deg) brightness(600%);",
-                                                    filter: "hue-rotate(45deg) brightness(600%);"
-                                                });
-                                            }
-                                        }
-                                    }
-                                } else if (elementos[i].sw != 1) {
-                                    for (x = 1; x < productoFinal.length; x++) {
-                                        idelemento = productoFinal[x].getIdelemento();
-                                        if (idelemento == elementos[i].id_elemento) {
-                                            id_img = "z_" + idelemento;
-                                            $("#" + id_img).css({
-                                                webkitfilter: "hue-rotate(45deg) brightness(600%);",
-                                                filter: "hue-rotate(45deg) brightness(600%);"
-                                            });
-                                        }
-                                    }
-                                }
-                            } else if (tipo == "general") {
-                                if (elementos[i].prioridad == 1) {
-                                    if (elementos[i].tipo == "control") {
-                                        valor = elementos[i].valor;
-                                        for (m = 0; m < elementos.length; m++) {
-                                            if (elementos[i].id_elemento == elementos[m].id_elemento) {
-                                                elementos[m].sw = 1;
-                                            }
-                                        }
-                                        umbral_superior = elementos[i].umbral_superior;
-                                        umbral_inferior = elementos[i].umbral_inferior;
-                                        for (x = 1; x < productoFinal.length; x++) {
-                                            idelemento = productoFinal[x].getIdelemento();
-                                            id_img = "z_" + idelemento;
-                                            if (idelemento == elementos[i].id_elemento) {
-                                                if (valor == "Detenido") {
-                                                    $("#" + id_img).css({
-                                                        webkitfilter: "hue-rotate(45deg) brightness(600%);",
-                                                        filter: "hue-rotate(45deg) brightness(600%);"
-                                                    });
-                                                } else if (valor == "Funcionando") {
-                                                    id_img = "z_" + idelemento;
-                                                    $("#" + id_img).css({
-                                                        webkitfilter: "hue-rotate(45deg) brightness(600%);",
-                                                        filter: "hue-rotate(45deg) brightness(600%);"
-                                                    });
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        valor = elementos[i].valor;
-                                        for (m = 0; m < elementos.length; m++) {
-                                            if (elementos[i].id_elemento == elementos[m].id_elemento) {
-                                                elementos[m].sw = 1;
-                                            }
-                                        }
-                                        umbral_superior = elementos[i].umbral_superior;
-                                        umbral_inferior = elementos[i].umbral_inferior;
-                                        for (x = 1; x < productoFinal.length; x++) {
-                                            id_img = "z_" + idelemento;
-                                            idelemento = productoFinal[x].getIdelemento();
-                                            if (idelemento == elementos[i].id_elemento) {
-                                                if (valor < umbral_inferior) {
-                                                    $("#" + id_img).css({
-                                                        webkitfilter: "hue-rotate(45deg) brightness(600%);",
-                                                        filter: "hue-rotate(45deg) brightness(600%);"
-                                                    });
-                                                } else if (valor > umbral_superior) {
-                                                    id_img = "z_" + idelemento;
-                                                    $("#" + id_img).css({
-                                                        webkitfilter: "hue-rotate(45deg) brightness(600%);",
-                                                        filter: "hue-rotate(45deg) brightness(600%);"
-                                                    });
-                                                } else {
-                                                    id_img = "z_" + idelemento;
-                                                    $("#" + id_img).css({
-                                                        webkitfilter: "hue-rotate(45deg) brightness(600%);",
-                                                        filter: "hue-rotate(45deg) brightness(600%);"
-                                                    });
-                                                }
-                                            }
-                                        }
-                                    }
-                                } else if (elementos[i].sw != 1) {
-                                    for (x = 1; x < productoFinal.length; x++) {
-                                        idelemento = productoFinal[x].getIdelemento();
-                                        if (idelemento == elementos[i].id_elemento) {
-                                            id_img = "z_" + idelemento;
-                                            $("#" + id_img).css({
-                                                webkitfilter: "hue-rotate(103deg) brightness(600%);",
-                                                filter: "hue-rotate(103deg) brightness(600%);"
-                                            });
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
+
             }
         });
+        function unique(arr) {
+            var hash = {}, result = [];
+            for (var i = 0; i < arr.length; i++)
+                if (!(arr[i] in hash)) { //it works with objects! in FF, at least
+                    hash[arr[i]] = true;
+                    result.push(arr[i]);
+                }
+            return result;
+        }
+        function ventana() {
+            if (!$('#myonoffswitch2').prop('checked')) {
+                globalventana = 2;
+            }
+            if ($('#myonoffswitch2').prop('checked')) {
+                globalventana = 1;
+            }
+        }
+        function enviarGrafico() {
+            if (globalventana == 1) {
+                window.open('', 'ventanaForm', 'menubar:no,toolbar=no,resizable=no,s crollbars=no,width=600,height=200,top=100,left=100 ');
+                document.forms["myform"].submit();
+            }
+            if (globalventana == 2) {
+                window.open('', 'ventanaForm', '');
+                document.forms["myform"].submit();
+            }
+        }
+        function enviarTimeline() {
+            window.open('', 'ventanaForm2', 'menubar:no,toolbar=no,resizable=no,s crollbars=no,width=600,height=200,top=100,left=100 ');
+            document.forms["myform2"].submit();
+        }
+
         function recargarPopup(id) {
             //erasepopup();
             //clearInterval(iteracion);
@@ -350,10 +448,11 @@ $id_empresa = $_SESSION['id_empresa'];
             for (var i = 1; i < productoFinal.length; i++) {
                 tipo = productoFinal[i].getTipo();
                 if (tipo == 1) {
+                    
                     var id_elemento = productoFinal[i].getIdelemento();
                     var top = document.getElementById('dom_' + id_elemento).style.top;
                     var data = 'id_empresa=' + id_empresa + '&id_elemento=' + id_elemento;
-
+                    alert(id_elemento);
                     $.ajax({
                         url: 'Ajax/llenarElemento.php',
                         type: 'post',
@@ -362,6 +461,7 @@ $id_empresa = $_SESSION['id_empresa'];
                         beforeSend: function () {
                         },
                         success: function (resp) {
+                            console.log(resp);
                             if (elemento = JSON.parse(resp)) {
                                 var umbral_min = elemento[0].umbral_inferior;
                                 var umbral_max = elemento[0].umbral_superior;
@@ -370,18 +470,10 @@ $id_empresa = $_SESSION['id_empresa'];
                                 porcentaje = porcentaje / umbral_max;
                                 porcentaje = Math.round(porcentaje);
                                 alert(porcentaje);
-                                $("#dom_" + id_elemento).prepend("<div id='porcentaje_" + id_elemento + "''><strong>" + porcentaje + "%</strong></div>");
+                                alert(id_elemento);
+                                $("#dom_"+id_elemento).prepend("<div id='porcentaje_" + id_elemento + "''><strong>" + porcentaje + "%</strong></div>");
                                 document.getElementById('porcentaje_' + id_elemento).style.top = top;
                             }
-                            /*var left = document.getElementById('dom_'+id_elemento).style.left;
-                             alert(left);
-                             left = left.split("p");
-                             var derecha = left[0]; 
-                             var derecha = parseInt(derecha);
-                             derecha = derecha + 62; 
-                             
-                             document.getElementById('porcentaje_'+id_elemento).style.left = derecha+"px";
-                             document.getElementById('porcentaje_'+id_elemento).style.position = "absolute";*/
                         }
                     });
                 }
@@ -539,6 +631,7 @@ $id_empresa = $_SESSION['id_empresa'];
             $(".info").remove();
         }
         function umbrales(value) {
+            alert(value);
             var id_empresa = <?php echo $id_empresa; ?>;
             var data = 'id_empresa=' + id_empresa;
             $.ajax({
@@ -566,7 +659,7 @@ $id_empresa = $_SESSION['id_empresa'];
                         url: 'Ajax/umbrales.php',
                         type: 'post',
                         data: data,
-                        //async:false,    
+                        async:false,    
                         beforeSend: function () {
                         },
                         success: function (resp) {
@@ -710,20 +803,24 @@ $id_empresa = $_SESSION['id_empresa'];
                                                 id_img = "z_" + idelemento;
                                                 if (idelemento == elementos[i].id_elemento) {
                                                     var tipoObj = productoFinal[x].getTipo();
-
-
-
                                                     if (valor == "Detenido") {
-                                                        $("#" + id_img).css({
-                                                            webkitfilter: "hue-rotate(10deg) brightness(300%)",
-                                                            filter: "hue-rotate(97deg) brightness(180%)"
-                                                        });
+                                                        neutral = productoFinal[x].getImgUp();
+                                                        productoFinal[x].cambiarUrl(neutral);
+                                                        var y = document.getElementById("dom_" + idelemento);
+                                                        y.remove(y.selectedIndex);
+                                                        var div = productoFinal[x].crearDOM();
+                                                        var nuevoElemento = $(div);
+                                                        $('#padre').append(nuevoElemento);
+                                                        
                                                     } else if (valor == "Funcionando") {
-                                                        id_img = "z_" + idelemento;
-                                                        $("#" + id_img).css({
-                                                            webkitfilter: "hue-rotate(50deg) brightness(600%);",
-                                                            filter: "hue-rotate(50deg) brightness(600%);"
-                                                        });
+                                                        
+                                                        neutral = productoFinal[x].getImgDown();
+                                                        productoFinal[x].cambiarUrl(neutral);
+                                                        var y = document.getElementById("dom_" + idelemento);
+                                                        y.remove(y.selectedIndex);
+                                                        var div = productoFinal[x].crearDOM();
+                                                        var nuevoElemento = $(div);
+                                                        $('#padre').append(nuevoElemento);
                                                     }
                                                     if (tipoObj == 2) {
                                                         var dom = "dom_" + elementos[i].id_elemento;
@@ -797,12 +894,11 @@ $id_empresa = $_SESSION['id_empresa'];
                                         }
                                     }
                                 }
-                            }
+                            }llenarElemento();
                         }
                     });
                 }
             });
-            llenarElemento();
         }
         function validarRiego(id, id_nodo) {
             var data = 'id_nodo=' + id_nodo;
@@ -921,6 +1017,7 @@ $id_empresa = $_SESSION['id_empresa'];
                 }
             });
         }
+        //umbrales('general');
     </script>
     <body>
 

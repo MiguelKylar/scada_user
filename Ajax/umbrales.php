@@ -21,7 +21,7 @@ while($datatmp = mysql_fetch_array($consulta)) {
 	$consulta1 = mysql_query($sql, $conEmp);
 	$resultado = 0; 
 	while($datatmp1 = mysql_fetch_assoc($consulta1)){
-    $sql = "select prioridad,id_aplicacion as id2, (SELECT url FROM aplicacion2 WHERE id_aplicacion = id2) as url,(SELECT icono FROM aplicacion2 WHERE id_aplicacion = id2) as icono from elemento_aplicacion where id = $id and tabla = '$tabla'";
+    $sql = "select id_aplicacion as id2, (SELECT url FROM aplicacion2 WHERE id_aplicacion = id2) as url,(SELECT icono FROM aplicacion2 WHERE id_aplicacion = id2) as icono from elemento_aplicacion where id = $id and tabla = '$tabla'";
 	$consulta3 = mysql_query($sql, $conEmp);
 	$m=0;
 	while($datatmp3 = mysql_fetch_assoc($consulta3)) {
@@ -33,9 +33,12 @@ while($datatmp = mysql_fetch_array($consulta)) {
 					$sensores[$indice] = $datatmp1;	
 					$sensores[$indice]['id_elemento'] = $id_elementos[$indice2];
 					$sensores[$indice]['id_aplicacion'] = $aplicacion;
-					$sensores[$indice]['prioridad'] = $aplicacion[0]["prioridad"];
+                                        $sql = "select prioridad from elemento_aplicacion where id = $id order by prioridad desc";
+                                        $consulta333 = mysql_query($sql, $conEmp);
+                                        if($datatmp99 = mysql_fetch_array($consulta333)){
+                                            $sensores[$indice]['prioridad'] = $datatmp99["prioridad"];
+                                        }
 					$tipo = $sensores[$indice]['tipo'];
-					
 					$sql = "SELECT nombre from parametro where tipo = '$tipo'";
 					$consulta777 = mysql_query($sql, $conEmp);
 					if($datatmp777 = mysql_fetch_array($consulta777)) {
@@ -62,7 +65,11 @@ while($datatmp = mysql_fetch_array($consulta)) {
 						$sensores[$indice] = $datatmp1;	
 						$sensores[$indice]['id_elemento'] = $id_elementos[$indice2];
 						$sensores[$indice]['id_aplicacion'] = $aplicacion;
-						$sensores[$indice]['prioridad'] = $aplicacion[0]["prioridad"];
+						$sql = "select prioridad from elemento_aplicacion where id = $id order by prioridad desc";
+                                                $consulta333 = mysql_query($sql, $conEmp);
+                                                if($datatmp99 = mysql_fetch_array($consulta333)){
+                                                    $sensores[$indice]['prioridad'] = $datatmp99["prioridad"];
+                                                }
 						$tipo = $sensores[$indice]['tipo'];
 						$sql = "select unidad from parametro where tipo = '$tipo'";
 						$consulta2 = mysql_query($sql, $conEmp);
