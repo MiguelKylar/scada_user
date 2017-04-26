@@ -135,7 +135,6 @@ $id_empresa = $_SESSION['id_empresa'];
 
                                                 if (valor < umbral_inferior) {
                                                     neutral = productoFinal[x].getImgDown();
-                                                    alert(neutral);
                                                     productoFinal[x].cambiarUrl(neutral);
                                                     var y = document.getElementById("dom_" + idelemento);
                                                     y.remove(y.selectedIndex);
@@ -299,10 +298,8 @@ $id_empresa = $_SESSION['id_empresa'];
                                                 dom = "dom_" + idelemento;
                                                 if (idelemento == elementos[i].id_elemento) {
                                                     var tipoObj = productoFinal[x].getTipo();
-                                                        alert(valor);
                                                     if (valor < umbral_inferior) {
                                                         neutral = productoFinal[x].getImgDown();
-                                                        alert(neutral);
                                                         productoFinal[x].cambiarUrl(neutral);
                                                         var y = document.getElementById("dom_" + idelemento);
                                                         //y.remove(y.selectedIndex);
@@ -310,7 +307,6 @@ $id_empresa = $_SESSION['id_empresa'];
                                                         var nuevoElemento = $(div);
                                                         $('#padre').append(nuevoElemento);
                                                     } else if (valor > umbral_superior) {
-                                                        alert(neutral);
                                                         neutral = productoFinal[x].getImgUp();
                                                         productoFinal[x].cambiarUrl(neutral);
                                                         var y = document.getElementById("dom_" + idelemento);
@@ -326,7 +322,6 @@ $id_empresa = $_SESSION['id_empresa'];
                                                         var div = productoFinal[x].crearDOM();
                                                         var nuevoElemento = $(div);
                                                         $('#padre').append(nuevoElemento);
-                                                        alert(neutral);
                                                     }
                                                     if (tipoObj == 2) {
                                                         var dom = "dom_" + elementos[i].id_elemento;
@@ -452,7 +447,6 @@ $id_empresa = $_SESSION['id_empresa'];
                     var id_elemento = productoFinal[i].getIdelemento();
                     var top = document.getElementById('dom_' + id_elemento).style.top;
                     var data = 'id_empresa=' + id_empresa + '&id_elemento=' + id_elemento;
-                    alert(id_elemento);
                     $.ajax({
                         url: 'Ajax/llenarElemento.php',
                         type: 'post',
@@ -469,8 +463,6 @@ $id_empresa = $_SESSION['id_empresa'];
                                 var porcentaje = valor * 100;
                                 porcentaje = porcentaje / umbral_max;
                                 porcentaje = Math.round(porcentaje);
-                                alert(porcentaje);
-                                alert(id_elemento);
                                 $("#dom_"+id_elemento).prepend("<div id='porcentaje_" + id_elemento + "''><strong>" + porcentaje + "%</strong></div>");
                                 document.getElementById('porcentaje_' + id_elemento).style.top = top;
                             }
@@ -631,7 +623,6 @@ $id_empresa = $_SESSION['id_empresa'];
             $(".info").remove();
         }
         function umbrales(value) {
-            alert(value);
             var id_empresa = <?php echo $id_empresa; ?>;
             var data = 'id_empresa=' + id_empresa;
             $.ajax({
@@ -686,7 +677,6 @@ $id_empresa = $_SESSION['id_empresa'];
 
                                                 if (valor < umbral_inferior) {
                                                     neutral = productoFinal[x].getImgDown();
-                                                    alert(neutral);
                                                     productoFinal[x].cambiarUrl(neutral);
                                                     var y = document.getElementById("dom_" + idelemento);
                                                     y.remove(y.selectedIndex);
@@ -848,7 +838,6 @@ $id_empresa = $_SESSION['id_empresa'];
 
                                                     if (valor < umbral_inferior) {
                                                         neutral = productoFinal[x].getImgDown();
-                                                        alert(neutral);
                                                         productoFinal[x].cambiarUrl(neutral);
                                                         var y = document.getElementById("dom_" + idelemento);
                                                         y.remove(y.selectedIndex);
