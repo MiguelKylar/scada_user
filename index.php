@@ -586,7 +586,7 @@ $id_empresa = $_SESSION['id_empresa'];
 
                         }
                         $("#info").prepend("<hr>");
-                        $("#info").prepend('<div style="color: #515151;/* font-size: x-large; */background-color: #cbcbcb;border-radius: 3px;color: #333333;font-weight: bold;"">Tetra</div>');
+                        $("#info").prepend('<div style="color: #515151;/* font-size: x-large; */background-color: #cbcbcb;border-radius: 3px;color: #333333;font-weight: bold;"">'+sensores[0].nombre_elem+'</div>');
                         $("#info").append("<hr>");
                         $("#info").append("<img src='imagenes/excel.png' style='float: right;width: 7%;top: -3px;position: relative;'>");
                         if (swOn == 1) {
@@ -1054,10 +1054,10 @@ $id_empresa = $_SESSION['id_empresa'];
             </form>
             <img style="width:2.6%;position:relative;float:right;top:-24px;" src="imagenes/logout.png" onclick="logout();">
         </div>
-        <div class="onoffswitch2" style="float: right; margin-top: 39%;">
+<!--        <div class="onoffswitch2" style="float: right; margin-top: 39%;">
             <input onclick="ventana();" type="checkbox" name="onoffswitch2" class="onoffswitch2-checkbox2" id="myonoffswitch2" checked>
             <label class="onoffswitch2-label2" for="myonoffswitch2"></label>
-        </div>
+        </div>-->
         <div id="infoline"></div>
         <div style="width: 100%; height: 100%" id="padre"></div>
     </body>

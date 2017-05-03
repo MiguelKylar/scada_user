@@ -10,6 +10,12 @@ include("m3totales.php");
 $indice = 0;
 $sensores = NULL;
 $sw = 0;
+
+$sql = "select descripcion from elemento where id_elemento = $id_elemento";
+$consulta = mysql_query($sql, $conEmp);
+if ($datatmp = mysql_fetch_array($consulta)) {
+    $sensores[0]['nombre_elem'] = $datatmp['descripcion'];
+}
 $sql = "select * from elemento_aplicacion where id_elemento = $id_elemento group by id";
 $consulta = mysql_query($sql, $conEmp);
 while ($datatmp = mysql_fetch_array($consulta)) {
